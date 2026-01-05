@@ -1,0 +1,32 @@
+function enforcePhoneFormat(executionContext) {
+    var formContext = executionContext.getFormContext();
+    var attribute = executionContext.getEventSource();
+
+    if (!attribute) return;
+
+    var phone = attribute.getValue();
+    if (!phone) return;
+
+    // Normalize input
+    phone = phone.replace(/[\s\-\(\)]/g, "");
+
+    // Regex: + followed by 2–3 digits (country code) and at least 5 digits phone number
+    var regex = /^\+\d{2,3}\d{5,}$/;
+
+    if (!regex.test(phone)) {
+        attribute.controls.forEach(function (control) {
+            control.setNotification(
+                "Phone number must start with + and a 2–3 digit country code (example: +4512345678)",
+                "phone_format"
+            );
+        });
+        return;
+    }
+
+    // Clear error
+    attribute.controls.forEach(function (control) {
+        control.clearNotification("phone_format");
+    });
+
+    attribute.setValue(phone);
+}
